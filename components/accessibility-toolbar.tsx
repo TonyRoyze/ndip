@@ -8,8 +8,6 @@ import { useAccessibility, type FontSize, type ContrastMode } from "@/hooks/use-
 import { cn } from "@/lib/utils"
 import {
   Contrast,
-  Minus,
-  Plus,
   Volume2,
   VolumeX,
   ZapOff,
@@ -161,7 +159,7 @@ export function AccessibilityToolbar() {
           aria-label="Accessibility settings"
           aria-expanded={open}
         >
-          <HighContrast className="mr-1 h-3 w-3" />
+          <Contrast className="mr-1 h-3 w-3" />
           A
         </Button>
       </PopoverTrigger>
