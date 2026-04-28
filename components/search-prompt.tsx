@@ -40,7 +40,9 @@ export function SearchPrompt({ className }: SearchPromptProps) {
     isSupported: isSpeechSupported,
     startListening,
     stopListening,
-  } = useSpeechRecognition({ lang: language === "si" ? "si-LK" : language === "ta" ? "ta-LK" : "en-US" })
+  } = useSpeechRecognition({
+    lang: language === "si" ? "si-LK" : language === "ta" ? "ta-LK" : "en-US",
+  })
 
   const displayQuery = query || interimTranscript || transcript
   const filteredItems = React.useMemo(
@@ -78,15 +80,15 @@ export function SearchPrompt({ className }: SearchPromptProps) {
   }, [focusedIndex])
 
   return (
-    <div className={cn("w-full max-w-2xl mx-auto", className)}>
+    <div className={cn("mx-auto w-full max-w-2xl", className)}>
       <div className="relative">
         <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+          className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
           aria-hidden="true"
         />
         <Input
           ref={inputRef}
-          type="search"
+          // type="search"
           placeholder="Type here to search or press the microphone button..."
           value={displayQuery}
           onChange={(e) => {
@@ -94,7 +96,7 @@ export function SearchPrompt({ className }: SearchPromptProps) {
             setFocusedIndex(-1)
           }}
           onKeyDown={handleKeyDown}
-          className="pl-10 pr-24 h-12 text-base"
+          className="h-12 pr-24 pl-10 text-base"
           aria-label="Search services"
           aria-controls="search-results"
           aria-autocomplete="list"
@@ -104,7 +106,7 @@ export function SearchPrompt({ className }: SearchPromptProps) {
               : undefined
           }
         />
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+        <div className="absolute top-1/2 right-2 flex -translate-y-1/2 gap-1">
           {displayQuery && (
             <Button
               variant="ghost"
@@ -144,7 +146,7 @@ export function SearchPrompt({ className }: SearchPromptProps) {
           id="search-results"
           role="listbox"
           aria-label="Search results"
-          className="mt-2 border rounded-lg bg-background overflow-hidden"
+          className="mt-2 overflow-hidden rounded-lg border bg-background"
         >
           {filteredItems.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
@@ -158,20 +160,18 @@ export function SearchPrompt({ className }: SearchPromptProps) {
                 role="option"
                 aria-selected={focusedIndex === index}
                 className={cn(
-                  "px-4 py-3 cursor-pointer transition-colors",
+                  "cursor-pointer px-4 py-3 transition-colors",
                   "flex items-center justify-between gap-4",
-                  focusedIndex === index
-                    ? "bg-muted"
-                    : "hover:bg-muted/50"
+                  focusedIndex === index ? "bg-muted" : "hover:bg-muted/50"
                 )}
                 onClick={() => {
                   window.location.href = item.href
                 }}
                 onMouseEnter={() => setFocusedIndex(index)}
               >
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="font-medium">{item.label[language]}</div>
-                  <div className="text-sm text-muted-foreground truncate">
+                  <div className="truncate text-sm text-muted-foreground">
                     {item.description[language]}
                   </div>
                 </div>
@@ -184,7 +184,7 @@ export function SearchPrompt({ className }: SearchPromptProps) {
         </div>
       )}
 
-      <p className="mt-2 text-xs text-muted-foreground text-center">
+      <p className="mt-2 text-center text-xs text-muted-foreground">
         Use arrow keys to navigate, Enter to select, Esc to clear
       </p>
     </div>
