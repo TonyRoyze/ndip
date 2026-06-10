@@ -1,8 +1,7 @@
 "use client"
 
 import * as React from "react"
-
-export type Language = "en" | "si" | "ta"
+import type { Language } from "@/lib/portal-content"
 
 export type FontSize = "default" | "large" | "extra-large"
 
@@ -24,6 +23,7 @@ export interface AccessibilityActions {
   toggleViMode: () => void
   toggleTts: () => void
   setLanguage: (lang: Language) => void
+  resetPreferences: () => void
 }
 
 export type AccessibilityContextValue = AccessibilityState & AccessibilityActions
@@ -31,6 +31,15 @@ export type AccessibilityContextValue = AccessibilityState & AccessibilityAction
 const AccessibilityContext = React.createContext<AccessibilityContextValue | null>(null)
 
 const STORAGE_KEY = "ndip-accessibility"
+
+const defaultState: AccessibilityState = {
+  fontSize: "default",
+  contrastMode: "normal",
+  lowStressMode: false,
+  viMode: false,
+  ttsEnabled: false,
+  language: "en",
+}
 
 function getStoredState(): Partial<AccessibilityState> {
   if (typeof window === "undefined") return {}
@@ -51,22 +60,54 @@ function storeState(state: AccessibilityState) {
   }
 }
 
+function getReadablePageText() {
+  const main = document.querySelector("main")
+  const source = main ?? document.body
+  return source.textContent?.replace(/\s+/g, " ").trim() ?? ""
+}
+
 export function AccessibilityProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = React.useState<AccessibilityState>(() => {
     const stored = getStoredState()
     return {
-      fontSize: stored.fontSize ?? "default",
-      contrastMode: stored.contrastMode ?? "normal",
-      lowStressMode: stored.lowStressMode ?? false,
-      viMode: stored.viMode ?? false,
-      ttsEnabled: stored.ttsEnabled ?? false,
-      language: stored.language ?? "en",
+      ...defaultState,
+      ...stored,
     }
   })
 
   React.useEffect(() => {
     storeState(state)
   }, [state])
+
+  React.useEffect(() => {
+    const root = document.documentElement
+    root.lang = state.language
+    root.dataset.fontSize = state.fontSize
+    root.dataset.contrast = state.contrastMode
+    root.dataset.lowStress = String(state.lowStressMode)
+    root.dataset.viMode = String(state.viMode)
+  }, [state.fontSize, state.contrastMode, state.lowStressMode, state.viMode, state.language])
+
+  React.useEffect(() => {
+    if (!("speechSynthesis" in window)) return
+
+    window.speechSynthesis.cancel()
+
+    if (!state.ttsEnabled) return
+
+    const text = getReadablePageText()
+    if (!text) return
+
+    const utterance = new SpeechSynthesisUtterance(text.slice(0, 4500))
+    utterance.lang =
+      state.language === "si" ? "si-LK" : state.language === "ta" ? "ta-LK" : "en-US"
+    utterance.rate = state.lowStressMode ? 0.85 : 0.95
+    window.speechSynthesis.speak(utterance)
+
+    return () => {
+      window.speechSynthesis.cancel()
+    }
+  }, [state.ttsEnabled, state.language, state.lowStressMode])
 
   const setFontSize = React.useCallback((size: FontSize) => {
     setState((prev) => ({ ...prev, fontSize: size }))
@@ -92,6 +133,14 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     setState((prev) => ({ ...prev, language: lang }))
   }, [])
 
+  const resetPreferences = React.useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(STORAGE_KEY)
+      window.speechSynthesis?.cancel()
+    }
+    setState(defaultState)
+  }, [])
+
   return (
     <AccessibilityContext.Provider
       value={{
@@ -102,6 +151,7 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
         toggleViMode,
         toggleTts,
         setLanguage,
+        resetPreferences,
       }}
     >
       {children}

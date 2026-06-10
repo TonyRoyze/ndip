@@ -12,6 +12,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAccessibility } from "@/hooks/use-accessibility"
+import { uiText } from "@/lib/portal-content"
 import { cn } from "@/lib/utils"
 import { Phone, MessageCircle, Heart, AlertTriangle } from "lucide-react"
 
@@ -29,8 +31,8 @@ const crisisContacts: CrisisContact[] = [
   {
     id: "national-helpline",
     name: "National Mental Health Helpline",
-    nameSi: "ජාතික මානසම් සෞඛ්‍ය උපදෙසුම රේණුව",
-    nameTa: "தேசிய மனநல குறுக்கு மராம்",
+    nameSi: "ජාතික මානසික සෞඛ්‍ය උපකාරක දුරකථනය",
+    nameTa: "தேசிய மனநல உதவி அழைப்பு",
     phone: "1926",
     available: "24/7",
     type: "hotline",
@@ -38,8 +40,8 @@ const crisisContacts: CrisisContact[] = [
   {
     id: "sahana",
     name: "Sahana Foundation",
-    nameSi: "සාහාන පදනම",
-    nameTa: "சகானா அடிப்படை",
+    nameSi: "සහන පදනම",
+    nameTa: "சஹானா அறக்கட்டளை",
     phone: "1333",
     available: "24/7",
     type: "hotline",
@@ -47,8 +49,8 @@ const crisisContacts: CrisisContact[] = [
   {
     id: "sumithrayo",
     name: "Sumithrayo Crisis Hotline",
-    nameSi: "සුමිත රාය අර්බුද රේණුව",
-    nameTa: "சுமித்ரயோ நெருக்கடை ஹாட்லைன்",
+    nameSi: "සුමිත්‍රයෝ අර්බුද උපකාරක දුරකථනය",
+    nameTa: "சுமித்ரயோ நெருக்கடி உதவி அழைப்பு",
     phone: "011 057 057 0",
     available: "24/7",
     type: "hotline",
@@ -56,7 +58,7 @@ const crisisContacts: CrisisContact[] = [
   {
     id: "emergency",
     name: "Emergency Services",
-    nameSi: "පහත සේව�",
+    nameSi: "හදිසි සේවා",
     nameTa: "அவசர சேவைகள்",
     phone: "119",
     available: "24/7",
@@ -78,6 +80,7 @@ export function CrisisSupportModal({
   className?: string
 }) {
   const [open, setOpen] = React.useState(false)
+  const { language } = useAccessibility()
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -92,7 +95,7 @@ export function CrisisSupportModal({
             )}
           >
             <Heart className="mr-2 h-4 w-4" />
-            Get Help Now
+            {uiText.getHelpNow[language]}
           </Button>
         )}
       </DialogTrigger>
@@ -124,7 +127,7 @@ export function CrisisSupportModal({
                     ) : (
                       <Phone className="h-4 w-4 text-green-500" />
                     )}
-                    {contact.name}
+                    {getContactName(contact, language)}
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {contact.available}
@@ -168,18 +171,21 @@ export function CrisisSupportModal({
 }
 
 export function CrisisSupportButton({ className }: { className?: string }) {
+  const { language, lowStressMode } = useAccessibility()
+
   return (
     <CrisisSupportModal className={className}>
       <Button
         variant="destructive"
         size="sm"
         className={cn(
-          "bg-red-600 hover:bg-red-700 text-white font-semibold animate-pulse",
+          "bg-red-600 hover:bg-red-700 text-white font-semibold",
+          !lowStressMode && "motion-safe:animate-pulse",
           className
         )}
       >
         <Heart className="mr-2 h-4 w-4" />
-        Get Help Now
+        {uiText.getHelpNow[language]}
       </Button>
     </CrisisSupportModal>
   )

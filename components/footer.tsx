@@ -2,11 +2,10 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useAccessibility } from "@/hooks/use-accessibility"
 import { navigationItems } from "@/lib/navigation"
-import { cn } from "@/lib/utils"
+import { ministryName, portalName } from "@/lib/portal-content"
 import { Phone, Mail, MapPin, ExternalLink } from "lucide-react"
 
 const footerLinks = {
@@ -24,13 +23,13 @@ export function Footer() {
         <div className="grid gap-8 lg:grid-cols-4">
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 font-bold text-lg mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-primary text-primary-foreground">
-                ND
+              <div className="flex h-9 w-9 items-center justify-center rounded-sm border border-primary bg-background text-xs text-primary">
+                SL
               </div>
-              <span>NDIP</span>
+              <span>{portalName}</span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              National Digital Information Portal for Persons with Disabilities
+              National Inclusive Information Access Portal for Persons with Disabilities
             </p>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
@@ -131,7 +130,7 @@ export function Footer() {
             Community Empowerment
           </p>
           <p>
-            Designed for all Sri Lankans with disabilities
+            {ministryName}
           </p>
         </div>
       </div>

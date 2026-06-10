@@ -8,13 +8,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useAccessibility, type Language } from "@/hooks/use-accessibility"
-
-const languages: { value: Language; label: string; nativeLabel: string }[] = [
-  { value: "en", label: "English", nativeLabel: "English" },
-  { value: "si", label: "Sinhala", nativeLabel: "සිංහල" },
-  { value: "ta", label: "Tamil", nativeLabel: "தமிழ்" },
-]
+import { useAccessibility } from "@/hooks/use-accessibility"
+import { languages, type Language } from "@/lib/portal-content"
 
 export function LanguageSwitcher() {
   const { language, setLanguage } = useAccessibility()
@@ -23,7 +18,7 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="text-xs">
+        <Button variant="outline" size="sm" className="min-h-9 text-xs">
           <span className="mr-1">{currentLang.nativeLabel}</span>
           <span className="text-muted-foreground">({currentLang.label})</span>
         </Button>

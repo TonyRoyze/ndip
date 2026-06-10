@@ -7,39 +7,10 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useAccessibility } from "@/hooks/use-accessibility"
 import { SearchPrompt } from "@/components/search-prompt"
-import { quickAccessItems } from "@/lib/navigation"
-import {
-  FileText,
-  Building2,
-  HeartPulse,
-  Brain,
-  GraduationCap,
-  Briefcase,
-  Accessibility,
-  Scale,
-  Users,
-  MessageSquare,
-  HelpCircle,
-  ChevronRight,
-  AlertTriangle,
-} from "lucide-react"
+import { announcements, featuredPrograms, quickAccessItems, sections, uiText } from "@/lib/portal-content"
+import { AlertTriangle, CheckCircle2, ChevronRight } from "lucide-react"
 
-import { CrisisSupportButton } from "@/components/crisis-support-modal"
 import { SkipNavLink } from "@/components/skip-navigation"
-
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  benefits: FileText,
-  services: Building2,
-  healthcare: HeartPulse,
-  mental: Brain,
-  education: GraduationCap,
-  employment: Briefcase,
-  assistive: Accessibility,
-  rights: Scale,
-  community: Users,
-  complaints: MessageSquare,
-  help: HelpCircle,
-}
 
 function QuickAccessCard({
   item,
@@ -47,7 +18,7 @@ function QuickAccessCard({
   item: (typeof quickAccessItems)[0]
 }) {
   const { language } = useAccessibility()
-  const Icon = iconMap[item.id] ?? ChevronRight
+  const Icon = item.icon
 
   return (
     <Link href={item.href}>
@@ -70,7 +41,7 @@ function QuickAccessCard({
             {item.description[language]}
           </CardDescription>
           <div className="mt-3 flex items-center text-xs text-primary font-medium">
-            Learn more <ChevronRight className="h-3 w-3 ml-1" />
+            {uiText.learnMore[language]} <ChevronRight className="h-3 w-3 ml-1" />
           </div>
         </CardContent>
       </Card>
@@ -102,68 +73,19 @@ function AnnouncementCard({
   )
 }
 
-const announcements = [
-  {
-    title: "New Disability Allowance Applications Now Open",
-    date: "2026-04-01",
-    summary:
-      "Applications for the disability allowance program are now being accepted. Eligible persons with disabilities can apply online or at their nearest Divisional Secretariat.",
-  },
-  {
-    title: "Assistive Devices Distribution Program",
-    date: "2026-03-15",
-    summary:
-      "The Ministry will distribute wheelchairs, hearing aids, and mobility aids to eligible persons with disabilities across all provinces.",
-  },
-  {
-    title: "Mental Health Awareness Month",
-    date: "2026-03-01",
-    summary:
-      "March is Mental Health Awareness Month. Access our dedicated section for mental health resources, peer support, and crisis hotlines.",
-  },
-]
-
 export default function HomePage() {
   const { language } = useAccessibility()
-
-  const welcomeText = {
-    en: {
-      title: "National Disability Information Portal",
-      subtitle:
-        "Your trusted source for disability information, services, and support in Sri Lanka",
-      quickAccessTitle: "Quick Access Services",
-      announcementsTitle: "Latest Announcements",
-      emergencyTitle: "Emergency Contacts",
-    },
-    si: {
-      title: "ජාතික වක්ෂේධ තොරතුරු පොරේලය",
-      subtitle:
-        "ශ්‍රී ලංකාවේ වක්ෂේධ තොරතුරු, සේවා සහ සහය සඳහා ඔබගේ විශ්වසනීය මුලාව",
-      quickAccessTitle: "වේගවත් ප්‍රවේශ සේවා",
-      announcementsTitle: "නවතම නිවේදන",
-      emergencyTitle: "අර්බුද අකුමාපන",
-    },
-    ta: {
-      title: "தேசிய மாற்றுத்திறன் தகவல் போர்டல்",
-      subtitle:
-        "இலங்கையில் மாற்றுத்திறன் தகவல்கள், சேவைகள் மற்றும் ஆதரவுக்கான உங்கள் நம்பகமான மூலம்",
-      quickAccessTitle: "விரைவான அணுகல் சேவைகள்",
-      announcementsTitle: "சமீபத்திய அறிவிப்புகள்",
-      emergencyTitle: "அவசர தொடர்புகள்",
-    },
-  }
-
-  const text = welcomeText[language]
+  const home = sections.home
 
   return (
     <div className="min-h-screen">
-      <SkipNavLink href="#main-content">Skip to main content</SkipNavLink>
+      <SkipNavLink href="#main-content">{uiText.skipToMain[language]}</SkipNavLink>
 
       <section className="bg-primary/5 py-16 border-b">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4">{text.title}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-4">{home.title[language]}</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            {text.subtitle}
+            {home.summary[language]}
           </p>
 
           <SearchPrompt className="max-w-2xl mx-auto" />
@@ -173,7 +95,7 @@ export default function HomePage() {
       <main id="main-content" className="container mx-auto px-4 py-12">
         <section aria-labelledby="quick-access-heading" className="mb-12">
           <h2 id="quick-access-heading" className="text-2xl font-semibold mb-6">
-            {text.quickAccessTitle}
+            {uiText.quickAccessTitle[language]}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {quickAccessItems.map((item) => (
@@ -188,7 +110,7 @@ export default function HomePage() {
             className="lg:col-span-2"
           >
             <h2 id="announcements-heading" className="text-2xl font-semibold mb-6">
-              {text.announcementsTitle}
+              {uiText.announcementsTitle[language]}
             </h2>
             <div className="space-y-4">
               {announcements.map((announcement, index) => (
@@ -202,7 +124,7 @@ export default function HomePage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-destructive">
                   <AlertTriangle className="h-5 w-5" />
-                  {text.emergencyTitle}
+                  {uiText.emergencyTitle[language]}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -229,12 +151,26 @@ export default function HomePage() {
                   </p>
                 </div>
                 <Button variant="destructive" className="w-full" asChild>
-                  <a href="tel:1926">Call Now</a>
+                  <a href="tel:1926">{uiText.callNow[language]}</a>
                 </Button>
               </CardContent>
             </Card>
           </aside>
         </div>
+
+        <section aria-labelledby="featured-heading" className="mt-12">
+          <h2 id="featured-heading" className="text-2xl font-semibold mb-6">
+            {uiText.featuredTitle[language]}
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {featuredPrograms.map((program) => (
+              <div key={program} className="flex items-start gap-3 rounded-md border p-4">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                <p className="text-sm font-medium">{program}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
     </div>
   )

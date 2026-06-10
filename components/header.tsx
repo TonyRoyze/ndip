@@ -14,41 +14,11 @@ import { Separator } from "@/components/ui/separator"
 import { AccessibilityToolbar } from "@/components/accessibility-toolbar"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { CrisisSupportButton } from "@/components/crisis-support-modal"
-import { SkipNavLink } from "@/components/skip-navigation"
+import { PortalBrand } from "@/components/portal-brand"
 import { useAccessibility } from "@/hooks/use-accessibility"
 import { navigationItems } from "@/lib/navigation"
 import { cn } from "@/lib/utils"
-import {
-  Menu,
-  Home,
-  ChevronRight,
-  FileText,
-  Building2,
-  HeartPulse,
-  Brain,
-  GraduationCap,
-  Briefcase,
-  Accessibility,
-  Scale,
-  Users,
-  MessageSquare,
-  HelpCircle,
-} from "lucide-react"
-
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  home: Home,
-  benefits: FileText,
-  services: Building2,
-  healthcare: HeartPulse,
-  mental: Brain,
-  education: GraduationCap,
-  employment: Briefcase,
-  assistive: Accessibility,
-  rights: Scale,
-  community: Users,
-  complaints: MessageSquare,
-  help: HelpCircle,
-}
+import { Menu } from "lucide-react"
 
 function NavLink({
   item,
@@ -57,7 +27,7 @@ function NavLink({
   item: (typeof navigationItems)[0]
   onClick?: () => void
 }) {
-  const Icon = iconMap[item.id] ?? ChevronRight
+  const Icon = item.icon
   const { language } = useAccessibility()
 
   return (
@@ -80,6 +50,8 @@ function NavLink({
 }
 
 function DesktopNav() {
+  const { language } = useAccessibility()
+
   return (
     <nav className="hidden lg:flex items-center gap-1" aria-label="Main navigation">
       {navigationItems.slice(0, 8).map((item) => (
@@ -92,7 +64,7 @@ function DesktopNav() {
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           )}
         >
-          {item.label.en}
+          {item.label[language]}
         </Link>
       ))}
     </nav>
@@ -112,7 +84,7 @@ function MobileNav() {
       </SheetTrigger>
       <SheetContent side="left" className="w-80">
         <SheetHeader>
-          <SheetTitle>NDIP Navigation</SheetTitle>
+          <SheetTitle>NIIAP Navigation</SheetTitle>
         </SheetHeader>
         <nav className="mt-6 space-y-1" aria-label="Mobile navigation">
           {navigationItems.map((item) => (
@@ -141,19 +113,7 @@ export function Header() {
         <div className="flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <MobileNav />
-            <Link
-              href="/"
-              className={cn(
-                "flex items-center gap-2 font-bold text-lg",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                "rounded-sm"
-              )}
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-primary text-primary-foreground">
-                ND
-              </div>
-              <span className="hidden sm:inline">NDIP</span>
-            </Link>
+            <PortalBrand />
             <DesktopNav />
           </div>
 
@@ -178,7 +138,7 @@ export function MobileFooterNav() {
     >
       <div className="flex overflow-x-auto">
         {navigationItems.slice(0, 6).map((item) => {
-          const Icon = iconMap[item.id] ?? ChevronRight
+          const Icon = item.icon
           return (
             <Link
               key={item.id}

@@ -8,6 +8,7 @@ import { useAccessibility, type FontSize, type ContrastMode } from "@/hooks/use-
 import { cn } from "@/lib/utils"
 import {
   Contrast,
+  RotateCcw,
   Volume2,
   VolumeX,
   ZapOff,
@@ -17,10 +18,10 @@ import {
 function FontSizeControl() {
   const { fontSize, setFontSize } = useAccessibility()
 
-  const sizes: { value: FontSize; label: string; className: string }[] = [
-    { value: "default", label: "A", className: "text-sm" },
-    { value: "large", label: "A", className: "text-base" },
-    { value: "extra-large", label: "A", className: "text-lg" },
+  const sizes: { value: FontSize; label: string; ariaLabel: string; className: string }[] = [
+    { value: "default", label: "A", ariaLabel: "Set default font size", className: "text-sm" },
+    { value: "large", label: "A+", ariaLabel: "Set large font size", className: "text-base" },
+    { value: "extra-large", label: "A++", ariaLabel: "Set extra large font size", className: "text-lg" },
   ]
 
   return (
@@ -32,9 +33,9 @@ function FontSizeControl() {
             key={size.value}
             variant={fontSize === size.value ? "default" : "outline"}
             size="sm"
-            className={cn("w-8 h-8 p-0", size.className)}
+            className={cn("h-9 min-w-9 p-0", size.className)}
             onClick={() => setFontSize(size.value)}
-            aria-label={`Set font size to ${size.label}`}
+            aria-label={size.ariaLabel}
             aria-pressed={fontSize === size.value}
           >
             {size.label}
@@ -48,12 +49,19 @@ function FontSizeControl() {
 function ContrastControl() {
   const { contrastMode, setContrastMode } = useAccessibility()
 
-  const modes: { value: ContrastMode; label: string; className: string }[] = [
-    { value: "normal", label: "Normal", className: "bg-white border-2 border-black" },
+  const modes: { value: ContrastMode; label: string; shortLabel: string; className: string }[] = [
+    { value: "normal", label: "Normal contrast", shortLabel: "N", className: "bg-white text-black border-2 border-black" },
     {
       value: "high-contrast-light",
-      label: "High",
-      className: "bg-black text-white",
+      label: "High contrast dark text on light background",
+      shortLabel: "DL",
+      className: "bg-white text-black border-2 border-black",
+    },
+    {
+      value: "high-contrast-dark",
+      label: "High contrast light text on dark background",
+      shortLabel: "LD",
+      className: "bg-black text-white border-2 border-white",
     },
   ]
 
@@ -67,15 +75,15 @@ function ContrastControl() {
             variant={contrastMode === mode.value ? "default" : "outline"}
             size="sm"
             className={cn(
-              "w-8 h-8 p-0 text-xs font-medium",
+              "h-9 min-w-9 p-0 text-xs font-medium",
               mode.className,
-              contrastMode !== mode.value && "border-2 border-black"
+              contrastMode !== mode.value && "border-2"
             )}
             onClick={() => setContrastMode(mode.value)}
-            aria-label={`Set ${mode.label} contrast`}
+            aria-label={`Set ${mode.label}`}
             aria-pressed={contrastMode === mode.value}
           >
-            {mode.label.slice(0, 2)}
+            {mode.shortLabel}
           </Button>
         ))}
       </div>
@@ -146,6 +154,22 @@ function VIModeControl() {
   )
 }
 
+function ResetControl() {
+  const { resetPreferences } = useAccessibility()
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="w-full justify-start"
+      onClick={resetPreferences}
+    >
+      <RotateCcw className="mr-2 h-4 w-4" />
+      Reset preferences
+    </Button>
+  )
+}
+
 export function AccessibilityToolbar() {
   const [open, setOpen] = React.useState(false)
 
@@ -182,6 +206,7 @@ export function AccessibilityToolbar() {
           <TTSControl />
           <LowStressControl />
           <VIModeControl />
+          <ResetControl />
         </div>
       </PopoverContent>
     </Popover>
