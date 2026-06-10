@@ -1,12 +1,14 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useAccessibility } from "@/hooks/use-accessibility"
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition"
-import { navigationItems, type NavigationItem } from "@/lib/navigation"
+import { allSearchableItems } from "@/lib/navigation"
+import { uiText } from "@/lib/portal-content"
 import { cn } from "@/lib/utils"
 import { Search, Mic, MicOff, X } from "lucide-react"
 
@@ -14,7 +16,9 @@ interface SearchPromptProps {
   className?: string
 }
 
-function filterItems(query: string, items: NavigationItem[]): NavigationItem[] {
+type SearchableItem = (typeof allSearchableItems)[number]
+
+function filterItems(query: string, items: SearchableItem[]): SearchableItem[] {
   if (!query.trim()) return items
   const lower = query.toLowerCase()
   return items.filter(
@@ -31,6 +35,7 @@ export function SearchPrompt({ className }: SearchPromptProps) {
   const [focusedIndex, setFocusedIndex] = React.useState(-1)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const listRef = React.useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   const { language } = useAccessibility()
   const {
@@ -46,8 +51,15 @@ export function SearchPrompt({ className }: SearchPromptProps) {
 
   const displayQuery = query || interimTranscript || transcript
   const filteredItems = React.useMemo(
-    () => filterItems(displayQuery, navigationItems),
+    () => filterItems(displayQuery, allSearchableItems),
     [displayQuery]
+  )
+
+  const navigateTo = React.useCallback(
+    (href: string) => {
+      router.push(href)
+    },
+    [router]
   )
 
   const handleKeyDown = React.useCallback(
@@ -62,14 +74,14 @@ export function SearchPrompt({ className }: SearchPromptProps) {
         setFocusedIndex((prev) => (prev > 0 ? prev - 1 : 0))
       } else if (e.key === "Enter" && focusedIndex >= 0) {
         e.preventDefault()
-        window.location.href = filteredItems[focusedIndex].href
+        navigateTo(filteredItems[focusedIndex].href)
       } else if (e.key === "Escape") {
         setQuery("")
         setFocusedIndex(-1)
         inputRef.current?.blur()
       }
     },
-    [focusedIndex, filteredItems]
+    [focusedIndex, filteredItems, navigateTo]
   )
 
   React.useEffect(() => {
@@ -88,8 +100,8 @@ export function SearchPrompt({ className }: SearchPromptProps) {
         />
         <Input
           ref={inputRef}
-          // type="search"
-          placeholder="Type here to search or press the microphone button..."
+          type="search"
+          placeholder={uiText.searchPlaceholder[language]}
           value={displayQuery}
           onChange={(e) => {
             setQuery(e.target.value)
@@ -97,7 +109,7 @@ export function SearchPrompt({ className }: SearchPromptProps) {
           }}
           onKeyDown={handleKeyDown}
           className="h-12 pr-24 pl-10 text-base"
-          aria-label="Search services"
+          aria-label={uiText.searchLabel[language]}
           aria-controls="search-results"
           aria-autocomplete="list"
           aria-activedescendant={
@@ -150,7 +162,7 @@ export function SearchPrompt({ className }: SearchPromptProps) {
         >
           {filteredItems.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
-              No results found for &ldquo;{displayQuery}&rdquo;
+              {uiText.noResults[language]}: &ldquo;{displayQuery}&rdquo;
             </div>
           ) : (
             filteredItems.map((item, index) => (
@@ -165,7 +177,7 @@ export function SearchPrompt({ className }: SearchPromptProps) {
                   focusedIndex === index ? "bg-muted" : "hover:bg-muted/50"
                 )}
                 onClick={() => {
-                  window.location.href = item.href
+                  navigateTo(item.href)
                 }}
                 onMouseEnter={() => setFocusedIndex(index)}
               >
@@ -185,7 +197,7 @@ export function SearchPrompt({ className }: SearchPromptProps) {
       )}
 
       <p className="mt-2 text-center text-xs text-muted-foreground">
-        Use arrow keys to navigate, Enter to select, Esc to clear
+        {uiText.searchHint[language]}
       </p>
     </div>
   )
